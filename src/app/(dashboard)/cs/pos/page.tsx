@@ -8,6 +8,7 @@ import Input from '@/components/common/Input';
 import Card from '@/components/common/Card';
 import Badge from '@/components/common/Badge';
 import Modal from '@/components/common/Modal';
+import { ShoppingCart, Package, Printer, Construction, Search, Minus, Plus } from 'lucide-react';
 
 interface Product {
   id: number;
@@ -130,7 +131,9 @@ export default function POSPage() {
         <div className={styles.productList}>
           {filteredProducts.map(p => (
             <Card key={p.id} onClick={() => addToCart(p)} style={{ opacity: p.stock <= 0 ? 0.6 : 1, cursor: p.stock <= 0 ? 'not-allowed' : 'pointer' }}>
-              <div style={{ textAlign: 'center', fontSize: '32px', marginBottom: '10px' }}>{p.icon || '📦'}</div>
+              <div style={{ textAlign: 'center', marginBottom: '10px', color: 'var(--color-primary-600)' }}>
+                <Package size={32} strokeWidth={1.5} />
+              </div>
               <div style={{ fontWeight: 'bold', fontSize: '14px' }}>{p.name}</div>
               <div style={{ color: 'var(--color-text-muted)', fontSize: '12px' }}>{formatIDR(p.price)}</div>
               <div style={{ fontSize: '11px', marginTop: '4px', color: p.stock > 10 ? 'var(--color-success)' : 'var(--color-error)' }}>
@@ -156,7 +159,7 @@ export default function POSPage() {
         <div className={styles.cartItems}>
           {cart.length === 0 ? (
             <div className={styles.emptyCart}>
-              <span>🛒</span>
+              <ShoppingCart size={48} strokeWidth={1} style={{ opacity: 0.2, marginBottom: '12px' }} />
               <p>Cart is empty</p>
             </div>
           ) : (
@@ -204,9 +207,11 @@ export default function POSPage() {
         title="Transaction Finalized"
       >
         <div className="modalContent" style={{ textAlign: 'center' }}>
-          <div style={{ fontSize: '48px', marginBottom: '16px' }}>🏗️</div>
-          <h3>TB (Toko Bangunan)</h3>
-          <p style={{ fontSize: '12px', color: 'var(--color-text-muted)' }}>Official Digital Receipt</p>
+          <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '16px', color: 'var(--color-primary-600)' }}>
+            <Construction size={48} strokeWidth={1.5} />
+          </div>
+          <h3 style={{ textTransform: 'uppercase', letterSpacing: '2px' }}>TB (Toko Bangunan)</h3>
+          <p style={{ fontSize: '11px', color: 'var(--color-text-muted)', fontWeight: 'bold' }}>OFFICIAL DIGITAL RECEIPT</p>
           
           <hr style={{ margin: '20px 0', border: 'none', borderTop: '1px dashed var(--color-border)' }} />
           
@@ -232,10 +237,11 @@ export default function POSPage() {
               style={{ 
                 width: '100%', padding: '12px', backgroundColor: 'var(--color-primary-900)', 
                 color: 'white', border: 'none', borderRadius: '8px', fontWeight: 'bold', cursor: 'pointer',
-                marginBottom: '10px'
+                marginBottom: '10px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px'
               }}
             >
-              🖨️ Print Receipt
+              <Printer size={18} />
+              Print Receipt
             </button>
             <button 
               onClick={() => { setSuccessModalOpen(false); clearCart(); }}

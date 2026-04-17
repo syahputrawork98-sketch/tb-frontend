@@ -4,6 +4,7 @@ import React from 'react';
 import { usePathname } from 'next/navigation';
 import styles from './Navbar.module.css';
 import { useAuthStore } from '@/store/authStore';
+import { User } from 'lucide-react';
 
 const Navbar = () => {
   const pathname = usePathname();
@@ -24,7 +25,9 @@ const Navbar = () => {
           <span className={styles.roleTag}>{roleName}</span>
           <span className={styles.userName}>{user?.username || 'Guest'}</span>
         </div>
-        <div className={styles.avatar}>{user?.username?.charAt(0).toUpperCase() || '👤'}</div>
+        <div className={styles.avatar}>
+          {user?.username ? user.username.charAt(0).toUpperCase() : <User size={18} />}
+        </div>
       </div>
     </header>
   );

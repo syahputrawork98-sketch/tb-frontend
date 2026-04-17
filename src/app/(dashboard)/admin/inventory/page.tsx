@@ -8,6 +8,7 @@ import Button from '@/components/common/Button';
 import Modal from '@/components/common/Modal';
 import Input from '@/components/common/Input';
 import Badge from '@/components/common/Badge';
+import { Package, Pencil, Trash2, AlertTriangle, Search, Plus } from 'lucide-react';
 
 interface Product {
   id: number;
@@ -124,7 +125,10 @@ export default function AdminInventoryPage() {
             onChange={(e) => setSearch(e.target.value)}
           />
         </div>
-        <Button onClick={() => handleOpenModal()}>+ Add New Product</Button>
+        <Button onClick={() => handleOpenModal()}>
+          <Plus size={18} style={{ marginRight: '8px' }} />
+          Add New Product
+        </Button>
       </header>
 
       <div className={styles.tableCard}>
@@ -147,7 +151,7 @@ export default function AdminInventoryPage() {
                 <td style={{ fontWeight: 'mono', fontSize: '12px' }}>{p.sku}</td>
                 <td>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                    <span style={{ fontSize: '20px' }}>{p.icon}</span>
+                    <Package size={20} style={{ color: 'var(--color-primary-600)' }} />
                     <span style={{ fontWeight: 'bold' }}>{p.name}</span>
                   </div>
                 </td>
@@ -160,13 +164,17 @@ export default function AdminInventoryPage() {
                 </td>
                 <td>
                   <div className={`${styles.stockLevel} ${p.stock <= LOW_STOCK_THRESHOLD ? styles.lowStock : ''}`}>
-                    {p.stock <= LOW_STOCK_THRESHOLD ? '⚠️ ' : ''}
+                    {p.stock <= LOW_STOCK_THRESHOLD && <AlertTriangle size={14} style={{ marginRight: '6px' }} />}
                     {p.stock} {p.unit}
                   </div>
                 </td>
                 <td style={{ textAlign: 'right' }}>
-                  <button className={`${styles.actionBtn} ${styles.editBtn}`} onClick={() => handleOpenModal(p)}>✏️</button>
-                  <button className={`${styles.actionBtn} ${styles.deleteBtn}`} onClick={() => handleDelete(p.id)}>🗑️</button>
+                  <button className={`${styles.actionBtn} ${styles.editBtn}`} onClick={() => handleOpenModal(p)}>
+                    <Pencil size={16} />
+                  </button>
+                  <button className={`${styles.actionBtn} ${styles.deleteBtn}`} onClick={() => handleDelete(p.id)}>
+                    <Trash2 size={16} />
+                  </button>
                 </td>
               </tr>
             ))}

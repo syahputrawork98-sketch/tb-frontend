@@ -6,6 +6,7 @@ import styles from './settings.module.css';
 import Button from '@/components/common/Button';
 import Input from '@/components/common/Input';
 import { useAuthStore } from '@/store/authStore';
+import { Building2, Settings, ShieldCheck, AlertTriangle } from 'lucide-react';
 
 export default function AdminSettingsPage() {
   const [activeTab, setActiveTab] = useState<'shop' | 'system' | 'account'>('shop');
@@ -31,10 +32,12 @@ export default function AdminSettingsPage() {
     try {
       const response = await api.get('/settings');
       const data = response.data;
-      setShopName(data.shopName);
-      setShopAddress(data.shopAddress);
-      setShopPhone(data.shopPhone);
-      setLowStockThreshold(data.lowStockThreshold);
+      if (data) {
+        setShopName(data.shopName || '');
+        setShopAddress(data.shopAddress || '');
+        setShopPhone(data.shopPhone || '');
+        setLowStockThreshold(data.lowStockThreshold || 10);
+      }
     } catch (error) {
       console.error('Failed to fetch settings');
     }
@@ -84,20 +87,23 @@ export default function AdminSettingsPage() {
         <button 
           className={`${styles.tabBtn} ${activeTab === 'shop' ? styles.activeTab : ''}`}
           onClick={() => setActiveTab('shop')}
+          style={{ display: 'flex', alignItems: 'center', gap: '8px' }}
         >
-          🏢 Profil Toko
+          <Building2 size={18} /> Profil Toko
         </button>
         <button 
           className={`${styles.tabBtn} ${activeTab === 'system' ? styles.activeTab : ''}`}
           onClick={() => setActiveTab('system')}
+          style={{ display: 'flex', alignItems: 'center', gap: '8px' }}
         >
-          ⚙️ Sistem Kasir
+          <Settings size={18} /> Sistem Kasir
         </button>
         <button 
           className={`${styles.tabBtn} ${activeTab === 'account' ? styles.activeTab : ''}`}
           onClick={() => setActiveTab('account')}
+          style={{ display: 'flex', alignItems: 'center', gap: '8px' }}
         >
-          🔐 Keamanan Akun
+          <ShieldCheck size={18} /> Keamanan Akun
         </button>
       </div>
 
@@ -148,7 +154,9 @@ export default function AdminSettingsPage() {
                   onChange={(e) => setLowStockThreshold(Number(e.target.value))}
                   required
                 />
-                <p className={styles.helpText}>Produk dengan stok di bawah nilai ini akan memicu peringatan ⚠️ di dashboard.</p>
+                <p className={styles.helpText}>
+                  Produk dengan stok di bawah nilai ini akan memicu peringatan <AlertTriangle size={14} style={{ display: 'inline', verticalAlign: 'middle', color: 'var(--color-error)' }} /> di dashboard.
+                </p>
               </div>
             </div>
             <Button type="submit" disabled={loading} style={{ marginTop: '20px' }}>

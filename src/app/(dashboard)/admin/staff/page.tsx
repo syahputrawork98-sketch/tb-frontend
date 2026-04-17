@@ -7,6 +7,7 @@ import Button from '@/components/common/Button';
 import Modal from '@/components/common/Modal';
 import Input from '@/components/common/Input';
 import Badge from '@/components/common/Badge';
+import { Trash2, UserPlus } from 'lucide-react';
 
 interface User {
   id: number;
@@ -78,7 +79,9 @@ export default function StaffManagementPage() {
           <h1 style={{ fontSize: 'var(--font-size-2xl)', fontWeight: 'bold' }}>Staff Management</h1>
           <p style={{ color: 'var(--color-text-muted)' }}>Manage your team and their access levels.</p>
         </div>
-        <Button onClick={() => setModalOpen(true)}>+ Add New Staff</Button>
+        <Button onClick={() => setModalOpen(true)} style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <UserPlus size={18} /> Add New Staff
+        </Button>
       </header>
 
       <div className={styles.tableCard}>
@@ -113,7 +116,7 @@ export default function StaffManagementPage() {
                     className={`${styles.actionBtn} ${styles.deleteBtn}`}
                     onClick={() => handleDeleteUser(user.id)}
                   >
-                    🗑️
+                    <Trash2 size={16} />
                   </button>
                 </td>
               </tr>

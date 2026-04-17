@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
+import { Printer } from 'lucide-react';
 import api from '@/utils/api';
 import Table from '@/components/common/Table';
 import Card from '@/components/common/Card';
@@ -38,7 +39,6 @@ export default function CSHistoryPage() {
   };
 
   const handlePrint = (transaction: any) => {
-    // Basic thermal-style print preview
     const printWindow = window.open('', '_blank');
     if (!printWindow) return;
 
@@ -94,7 +94,10 @@ export default function CSHistoryPage() {
       <Badge variant="neutral">{val.length} Produk</Badge>
     )},
     { header: 'Aksi', key: 'action', render: (_: any, item: any) => (
-      <Button size="md" variant="outline" onClick={() => handlePrint(item)}>🖨️ Cetak Ulang</Button>
+      <Button size="md" variant="outline" onClick={() => handlePrint(item)} style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+        <Printer size={16} />
+        Cetak Ulang
+      </Button>
     )}
   ];
 

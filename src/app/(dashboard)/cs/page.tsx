@@ -5,6 +5,7 @@ import api from '@/utils/api';
 import { useRouter } from 'next/navigation';
 import Button from '@/components/common/Button';
 import Card from '@/components/common/Card';
+import { ShoppingCart, AlertTriangle, Search, FileText } from 'lucide-react';
 
 export default function CSDashboard() {
   const router = useRouter();
@@ -40,8 +41,9 @@ export default function CSDashboard() {
           </h1>
           <p style={{ color: 'var(--color-text-muted)' }}>Pantauan performa shift Anda hari ini.</p>
         </div>
-        <Button onClick={() => router.push('/cs/pos')} size="lg">
-          🛒 Buka Kasir (POS)
+        <Button onClick={() => router.push('/cs/pos')} size="lg" style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <ShoppingCart size={20} />
+          Buka Kasir (POS)
         </Button>
       </header>
 
@@ -62,8 +64,9 @@ export default function CSDashboard() {
         </Card>
         <Card>
           <div style={{ color: 'var(--color-text-muted)', fontSize: '12px' }}>Stok Rendah (Peringatan)</div>
-          <div style={{ fontSize: '24px', fontWeight: 'bold', color: 'var(--color-error)', marginTop: '8px' }}>
-            {stats.lowStockItems} Item ⚠️
+          <div style={{ fontSize: '24px', fontWeight: 'bold', color: 'var(--color-error)', marginTop: '8px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+            {stats.lowStockItems} Item
+            {stats.lowStockItems > 0 && <AlertTriangle size={24} />}
           </div>
         </Card>
         <Card>
@@ -81,8 +84,14 @@ export default function CSDashboard() {
       }}>
         <h3 style={{ marginBottom: '16px' }}>Butuh Bantuan atau Cek Stok?</h3>
         <div style={{ display: 'flex', gap: '12px', justifyContent: 'center' }}>
-          <Button variant="outline" onClick={() => router.push('/cs/inventory')}>🔎 Cek Stok Barang</Button>
-          <Button variant="outline" onClick={() => router.push('/cs/history')}>📜 Riwayat Penjualan</Button>
+          <Button variant="outline" onClick={() => router.push('/cs/inventory')} style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <Search size={18} />
+            Cek Stok Barang
+          </Button>
+          <Button variant="outline" onClick={() => router.push('/cs/history')} style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <FileText size={18} />
+            Riwayat Penjualan
+          </Button>
         </div>
       </section>
     </div>

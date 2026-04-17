@@ -6,6 +6,7 @@ import styles from './reports.module.css';
 import { formatIDR, formatDate } from '@/utils/format';
 import Button from '@/components/common/Button';
 import Badge from '@/components/common/Badge';
+import { Printer, Search, FileText } from 'lucide-react';
 
 interface Transaction {
   id: number;
@@ -60,7 +61,9 @@ export default function SalesReportsPage() {
           <h1 style={{ fontSize: 'var(--font-size-2xl)', fontWeight: 'bold' }}>Sales Reporting</h1>
           <p style={{ color: 'var(--color-text-muted)' }}>Generate and print periodic sales summaries.</p>
         </div>
-        <Button onClick={handlePrint} variant="primary">🖨️ Print Report</Button>
+        <Button onClick={handlePrint} variant="primary" style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <Printer size={18} /> Print Report
+        </Button>
       </header>
 
       <div className={`${styles.filterBar} no-print`}>
@@ -82,7 +85,9 @@ export default function SalesReportsPage() {
             onChange={(e) => setEndDate(e.target.value)}
           />
         </div>
-        <Button onClick={fetchTransactions}>🔍 Filter Results</Button>
+        <Button onClick={fetchTransactions} style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <Search size={18} /> Filter Results
+        </Button>
       </div>
 
       <div className={styles.reportCard}>
