@@ -1,0 +1,59 @@
+.wrapper {
+  display: flex;
+  min-height: 100vh;
+  align-items: center;
+  justify-content: center;
+  padding: var(--spacing-lg);
+  background-color: var(--color-bg-main);
+}
+
+.card {
+  width: 100%;
+  max-width: 420px;
+  background-color: var(--color-bg-card);
+  padding: var(--spacing-xl);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-premium);
+  border: 1px solid var(--color-border);
+}
+
+.header {
+  text-align: center;
+  margin-bottom: var(--spacing-xl);
+}
+
+.logo {
+  font-size: var(--font-size-2xl);
+  margin-bottom: var(--spacing-xs);
+  display: block;
+}
+
+.title {
+  font-size: var(--font-size-xl);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-primary-900);
+}
+
+.subtitle {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-muted);
+  margin-top: 4px;
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+}
+
+.footer {
+  margin-top: var(--spacing-lg);
+  text-align: center;
+  font-size: var(--font-size-xs);
+  color: var(--color-text-muted);
+  line-height: 1.6;
+}
+
+.brandName {
+  color: var(--color-accent-orange);
+  font-weight: var(--font-weight-semibold);
+}

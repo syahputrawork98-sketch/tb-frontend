@@ -1,6 +1,6 @@
-# 🎨 StripTB - Frontend Hub
+# 🎨 TB (Toko Bangunan) - Frontend Hub
 
-Antarmuka web resmi untuk **StripTB (Toko Bangunan)**. Dirancang untuk memberikan pengalaman belanja material bangunan yang mulus bagi pelanggan dan dashboard operasional yang efisien bagi Admin/CS.
+Antarmuka web resmi untuk **TB (Toko Bangunan)**. Dirancang untuk memberikan pengalaman belanja material bangunan yang mulus bagi pelanggan dan dashboard operasional yang efisien bagi Admin/CS.
 
 ---
 
@@ -44,4 +44,4 @@ src/
    ```
 
 ---
-> *Crafting Beauty for StripTB with Vanilla CSS Precision.*
+> *Crafting Beauty for TB (Toko Bangunan) with Vanilla CSS Precision.*

@@ -1,0 +1,99 @@
+.wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-lg);
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.title {
+  font-size: var(--font-size-2xl);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-primary-900);
+}
+
+.tableContainer {
+  background-color: var(--color-bg-card);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--color-border);
+  box-shadow: var(--shadow-soft);
+  overflow: hidden;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+}
+
+.table th {
+  background-color: #fcfcfc;
+  padding: var(--spacing-md);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-text-muted);
+  text-transform: uppercase;
+  border-bottom: 2px solid var(--color-bg-main);
+}
+
+.table td {
+  padding: var(--spacing-md);
+  font-size: var(--font-size-sm);
+  border-bottom: 1px solid var(--color-bg-main);
+}
+
+.row:hover {
+  background-color: #fafafa;
+}
+
+.productInfo {
+  display: flex;
+  flex-direction: column;
+}
+
+.productName {
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-primary-900);
+}
+
+.sku {
+  font-size: 11px;
+  color: var(--color-text-muted);
+}
+
+.categoryTag {
+  padding: 4px 8px;
+  background-color: var(--color-bg-main);
+  border-radius: var(--radius-sm);
+  font-size: 11px;
+  font-weight: var(--font-weight-medium);
+}
+
+.stockBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  border-radius: 100px;
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-bold);
+}
+
+.stokAman {
+  background-color: rgba(16, 185, 129, 0.1);
+  color: var(--color-success);
+}
+
+.stokRendah {
+  background-color: rgba(239, 68, 68, 0.1);
+  color: var(--color-error);
+}
+
+.price {
+  font-weight: var(--font-weight-bold);
+  color: var(--color-primary-800);
+}
