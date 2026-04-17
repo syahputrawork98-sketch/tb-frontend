@@ -24,17 +24,24 @@ export const useAuthStore = create<AuthState>()(
       isAuthenticated: false,
       setAuth: (user, token) => {
         set({ user, token, isAuthenticated: true });
-        // Set cookies for middleware
-        Cookies.set('tb_token', token, { expires: 1 }); // 1 day
-        Cookies.set('tb_role', user.role, { expires: 1 });
+        // Set cookies for middleware with global path
+        Cookies.set('tb_token', token, { expires: 1, path: '/' });
+        Cookies.set('tb_role', user.role, { expires: 1, path: '/' });
       },
       logout: () => {
         set({ user: null, token: null, isAuthenticated: false });
-        Cookies.remove('tb_token');
-        Cookies.remove('tb_role');
+        // Thoroughly clear cookies
+        Cookies.remove('tb_token', { path: '/' });
+        Cookies.remove('tb_role', { path: '/' });
+        // Double check for some browsers that require explicit removal
+        document.cookie = "tb_token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+        document.cookie = "tb_role=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+
         if (typeof window !== 'undefined') {
-          localStorage.removeItem('tb_token');
-          localStorage.removeItem('tb_user');
+          localStorage.removeItem('tb-auth-storage'); 
+          localStorage.clear(); // Nuclear option to ensure no residues
+          // Force a full page reload to clear any memory states
+          window.location.href = '/login';
         }
       },
     }),

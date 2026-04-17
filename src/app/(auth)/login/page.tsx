@@ -30,7 +30,7 @@ export default function LoginPage() {
 
       // 2. Redirect based on backend role
       const roleMap: { [key: string]: string } = {
-        'ADMIN': '/admin/analytics',
+        'ADMIN': '/admin',
         'CS': '/cs/pos'
       };
 
@@ -48,17 +48,23 @@ export default function LoginPage() {
 
   return (
     <div className={styles.wrapper}>
+      {/* Premium Technical Corner Accents */}
+      <div className={`${styles.corner} ${styles.topLeft}`}></div>
+      <div className={`${styles.corner} ${styles.topRight}`}></div>
+      <div className={`${styles.corner} ${styles.bottomLeft}`}></div>
+      <div className={`${styles.corner} ${styles.bottomRight}`}></div>
+
       <div className={styles.card}>
         <div className={styles.header}>
           <span className={styles.logo}>🏗️</span>
-          <h1 className={styles.title}>Welcome Back</h1>
-          <p className={styles.subtitle}>Enter your credentials to access the TB system</p>
+          <h1 className={styles.title}>TB System</h1>
+          <p className={styles.subtitle}>Industrial Management</p>
         </div>
 
         <form className={styles.form} onSubmit={handleLogin}>
           <Input 
             label="Username" 
-            placeholder="e.g. admin or cs" 
+            placeholder="Masukkan username" 
             value={username}
             onChange={(e) => setUsername(e.target.value)}
             required
@@ -72,16 +78,16 @@ export default function LoginPage() {
             required
           />
           
-          {error && <p style={{ color: 'var(--color-error)', fontSize: '12px', marginBottom: '10px' }}>{error}</p>}
+          {error && <p style={{ color: 'var(--color-error)', fontSize: '11px', textAlign: 'center', fontWeight: 'bold' }}>{error}</p>}
           
           <Button type="submit" size="lg" disabled={loading} style={{ marginTop: 'var(--spacing-md)' }}>
-            {loading ? 'Authenticating...' : 'Sign In'}
+            {loading ? 'AUTHENTICATING...' : 'ACCESS SYSTEM'}
           </Button>
         </form>
 
         <div className={styles.footer}>
-          <p>© 2026 <span className={styles.brandName}>TB (Toko Bangunan)</span></p>
-          <p>Industrial Management System v1.0</p>
+          <p>CRYPTO-SECURED TERMINAL v1.0</p>
+          <p>© 2026 <span className={styles.brandName}>TOKO BANGUNAN TB</span></p>
         </div>
       </div>
     </div>

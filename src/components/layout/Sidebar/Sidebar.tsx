@@ -4,31 +4,35 @@ import React from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import styles from './Sidebar.module.css';
+import { useAuthStore } from '@/store/authStore';
 
 const Sidebar = () => {
   const pathname = usePathname();
+  const { logout } = useAuthStore();
 
-  // Role Detection Logic (Mock)
+  // Role Detection Logic
   const isAdmin = pathname.startsWith('/admin');
   const isCS = pathname.startsWith('/cs');
 
   const menuItems = [
-    // Global Dashboard for all
-    { icon: '📊', label: 'Dashboard', path: isAdmin ? '/admin/analytics' : '/cs' },
-    
-    // CS & Admin Only: Inventory
-    ...((isCS || isAdmin) ? [
-      { icon: '📦', label: 'Inventory', path: '/cs/inventory' },
-      { icon: '📝', label: 'Transactions', path: '/cs/pos' },
-    ] : []),
-
-    // Admin Only: Management
+    // Admin Dashboard
     ...(isAdmin ? [
-      { icon: '👥', label: 'Staff Management', path: '#' },
+      { icon: '📊', label: 'Analytics', path: '/admin/analytics' },
+      { icon: '👥', label: 'Staf Toko', path: '/admin/staff' },
+      { icon: '📦', label: 'Inventaris', path: '/admin/inventory' },
+      { icon: '📜', label: 'Laporan Penjualan', path: '/admin/reports' },
+    ] : []),
+    
+    // CS Dashboard
+    ...(isCS ? [
+      { icon: '📊', label: 'Monitor Shift', path: '/cs' },
+      { icon: '🛒', label: 'Kasir (POS)', path: '/cs/pos' },
+      { icon: '🔎', label: 'Cek Stok Barang', path: '/cs/inventory' },
+      { icon: '📜', label: 'Riwayat Penjualan', path: '/cs/history' },
     ] : []),
 
     // Settings for all
-    { icon: '⚙️', label: 'Settings', path: '#' },
+    { icon: '⚙️', label: 'Settings', path: isAdmin ? '/admin/settings' : '/cs/settings' },
   ];
 
   return (
@@ -55,7 +59,7 @@ const Sidebar = () => {
       </nav>
 
       <div className={styles.footer}>
-        <div className={styles.logoutBtn}>
+        <div className={styles.logoutBtn} onClick={() => logout()}>
           <span>🚪</span>
           <span>Logout</span>
         </div>

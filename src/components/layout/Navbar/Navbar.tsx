@@ -3,26 +3,28 @@
 import React from 'react';
 import { usePathname } from 'next/navigation';
 import styles from './Navbar.module.css';
+import { useAuthStore } from '@/store/authStore';
 
 const Navbar = () => {
   const pathname = usePathname();
+  const { user } = useAuthStore();
   
-  // Role Detection Logic (Mock)
+  // Role Detection Logic
   const roleName = pathname.startsWith('/admin') 
     ? 'Super Admin' 
-    : (pathname.startsWith('/cs') ? 'Customer Service' : 'Customer');
+    : (pathname.startsWith('/cs') ? 'Customer Service' : 'Staf');
 
   return (
     <header className={styles.navbar}>
       <div className={styles.left}>
-        <span className={styles.breadcrumb}>Dashboard / Overview</span>
+        <span className={styles.breadcrumb}>TB Dashboard / {roleName}</span>
       </div>
       <div className={styles.right}>
         <div className={styles.userInfo}>
           <span className={styles.roleTag}>{roleName}</span>
-          <span className={styles.userName}>Artdarkman</span>
+          <span className={styles.userName}>{user?.username || 'Guest'}</span>
         </div>
-        <div className={styles.avatar}>👤</div>
+        <div className={styles.avatar}>{user?.username?.charAt(0).toUpperCase() || '👤'}</div>
       </div>
     </header>
   );

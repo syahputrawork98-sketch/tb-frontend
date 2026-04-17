@@ -1,0 +1,65 @@
+.container {
+  padding: var(--spacing-xl);
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xl);
+}
+
+.tabs {
+  display: flex;
+  gap: var(--spacing-md);
+  border-bottom: 1px solid var(--color-border);
+  padding-bottom: var(--spacing-sm);
+}
+
+.tabBtn {
+  padding: 10px 24px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-weight: bold;
+  font-size: var(--font-size-sm);
+  color: var(--color-text-muted);
+  border-bottom: 2px solid transparent;
+  transition: all 0.2s;
+}
+
+.activeTab {
+  color: var(--color-primary-900);
+  border-bottom: 2px solid var(--color-primary-900);
+}
+
+.card {
+  background-color: var(--color-bg-card);
+  padding: var(--spacing-xl);
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--color-border);
+  box-shadow: var(--shadow-small);
+  max-width: 800px;
+}
+
+.sectionTitle {
+  font-size: var(--font-size-lg);
+  font-weight: bold;
+  margin-bottom: var(--spacing-md);
+  color: var(--color-text-main);
+  border-left: 4px solid var(--color-primary-900);
+  padding-left: 12px;
+}
+
+.formGrid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: var(--spacing-lg);
+}
+
+.fullWidth {
+  grid-column: 1 / -1;
+}
+
+.helpText {
+  font-size: 11px;
+  color: var(--color-text-muted);
+  margin-top: -8px;
+  margin-bottom: 12px;
+}

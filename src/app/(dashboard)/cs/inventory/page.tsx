@@ -1,84 +1,108 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import styles from './inventory.module.css';
-import Button from '@/components/common/Button';
 import api from '@/utils/api';
-import { formatIDR } from '@/utils/format';
+import Table from '@/components/common/Table';
+import Input from '@/components/common/Input';
+import Card from '@/components/common/Card';
+import Badge from '@/components/common/Badge';
 
-export default function InventoryPage() {
-  const [products, setProducts] = useState<any[]>([]);
+interface Product {
+  id: number;
+  sku: string;
+  name: string;
+  category: string;
+  price: number;
+  stock: number;
+  unit: string;
+  icon: string;
+}
+
+export default function CSInventoryPage() {
+  const [products, setProducts] = useState<Product[]>([]);
+  const [search, setSearch] = useState('');
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState('');
 
   useEffect(() => {
-    const fetchProducts = async () => {
-      try {
-        const response = await api.get('/products');
-        setProducts(response.data);
-      } catch (err) {
-        setError('Failed to load inventory data.');
-      } finally {
-        setLoading(false);
-      }
-    };
     fetchProducts();
   }, []);
-  return (
-    <div className={styles.wrapper}>
-      <header className={styles.header}>
+
+  const fetchProducts = async () => {
+    try {
+      const res = await api.get('/products');
+      setProducts(res.data);
+    } catch (err) {
+      console.error('Failed to fetch products');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const filtered = products.filter(p => 
+    p.name.toLowerCase().includes(search.toLowerCase()) ||
+    p.sku.toLowerCase().includes(search.toLowerCase()) ||
+    p.category.toLowerCase().includes(search.toLowerCase())
+  );
+
+  const formatIDR = (val: number) => {
+    return new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR' }).format(val);
+  };
+
+  const columns = [
+    { header: 'Info Barang', key: 'name', render: (val: string, item: Product) => (
+      <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+        <span style={{ fontSize: '20px' }}>{item.icon}</span>
         <div>
-          <h1 className={styles.title}>Inventory Stock</h1>
-          <p style={{ color: 'var(--color-text-muted)' }}>Manage your building material inventory</p>
+          <div style={{ fontWeight: 'bold' }}>{val}</div>
+          <div style={{ fontSize: '11px', color: 'var(--color-text-muted)' }}>{item.sku}</div>
         </div>
-        <Button style={{ width: 'auto' }}>+ Add New Product</Button>
+      </div>
+    )},
+    { header: 'Kategori', key: 'category', render: (val: string) => (
+      <Badge variant="neutral">{val}</Badge>
+    )},
+    { header: 'Stok Saat Ini', key: 'stock', render: (val: number, item: Product) => (
+      <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+        <span style={{ 
+          fontWeight: 'bold', 
+          color: val < 10 ? 'var(--color-error)' : 'var(--color-text-main)' 
+        }}>
+          {val} {item.unit}
+        </span>
+        {val < 10 && <span title="Stok Rendah!">⚠️</span>}
+      </div>
+    )},
+    { header: 'Harga Jual', key: 'price', render: (val: number) => (
+      <span style={{ fontWeight: 'bold', color: 'var(--color-primary-900)' }}>{formatIDR(val)}</span>
+    )}
+  ];
+
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--spacing-xl)' }}>
+      <header>
+        <h1 style={{ fontSize: 'var(--font-size-2xl)', fontWeight: 'bold' }}>Cek Stok & Harga</h1>
+        <p style={{ color: 'var(--color-text-muted)' }}>Cari material bangunan berdasarkan nama atau SKU.</p>
       </header>
 
-      {loading && <p style={{ textAlign: 'center', padding: 'var(--spacing-xl)' }}>Loading inventory data...</p>}
-      {error && <p style={{ textAlign: 'center', color: 'var(--color-error)', padding: 'var(--spacing-xl)' }}>{error}</p>}
+      <Card>
+        <div style={{ marginBottom: '20px', maxWidth: '400px' }}>
+          <Input 
+            placeholder="🔍 Cari nama barang, SKU, atau kategori..." 
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+          />
+        </div>
 
-      {!loading && !error && (
-        <div className={styles.tableContainer}>
-          <table className={styles.table}>
-            <thead>
-              <tr>
-                <th>Product Details</th>
-                <th>Category</th>
-                <th>Current Stock</th>
-                <th>Price</th>
-                <th>Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {products.map((item) => (
-                <tr key={item.id} className={styles.row}>
-                  <td>
-                    <div className={styles.productInfo}>
-                      <span className={styles.productName}>{item.name} {item.icon}</span>
-                      <span className={styles.sku}>{item.sku}</span>
-                    </div>
-                  </td>
-                  <td>
-                    <span className={styles.categoryTag}>{item.category}</span>
-                  </td>
-                  <td>
-                    <div className={`${styles.stockBadge} ${item.stock > 10 ? styles.stokAman : styles.stokRendah}`}>
-                      {item.stock} {item.unit}
-                    </div>
-                  </td>
-                  <td>
-                    <span className={styles.price}>{formatIDR(item.price)}</span>
-                  </td>
-                  <td>
-                    <div style={{ display: 'flex', gap: '8px' }}>
-                      <button style={{ background: 'none', border: 'none', cursor: 'pointer' }}>✏️</button>
-                      <button style={{ background: 'none', border: 'none', cursor: 'pointer' }}>🗑️</button>
-                    </div>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+        <Table 
+          columns={columns}
+          data={filtered}
+          loading={loading}
+        />
+      </Card>
+      
+      {filtered.length === 0 && !loading && (
+        <div style={{ textAlign: 'center', padding: '40px', color: 'var(--color-text-muted)' }}>
+          Barang tidak ditemukan. Coba kata kunci lain.
         </div>
       )}
     </div>

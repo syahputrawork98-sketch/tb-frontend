@@ -6,27 +6,33 @@ export function middleware(request: NextRequest) {
   const role = request.cookies.get('tb_role')?.value;
   const { pathname } = request.nextUrl;
 
-  // 1. If trying to access dashboard but no token, redirect to login
+  // 1. Root redirect logic
+  if (pathname === '/') {
+    if (token) {
+      const target = role === 'ADMIN' ? '/admin/analytics' : '/cs/pos';
+      return NextResponse.redirect(new URL(target, request.url));
+    }
+    return NextResponse.redirect(new URL('/login', request.url));
+  }
+
+  // 2. If trying to access dashboard but no token, redirect to login
   if ((pathname.startsWith('/admin') || pathname.startsWith('/cs')) && !token) {
     return NextResponse.redirect(new URL('/login', request.url));
   }
 
-  // 2. If logged in and trying to access login page, redirect to their dashboard
+  // 3. If logged in and trying to access login page, redirect to their dashboard
   if (pathname === '/login' && token) {
-    if (role === 'ADMIN') {
-      return NextResponse.redirect(new URL('/admin/analytics', request.url));
-    }
-    return NextResponse.redirect(new URL('/cs/pos', request.url));
+    const target = role === 'ADMIN' ? '/admin/analytics' : '/cs/pos';
+    return NextResponse.redirect(new URL(target, request.url));
   }
 
-  // 3. Role-based protection
-  // Admin cannot access CS-only pages (if any) and vice-versa
+  // 4. Role-based protection (BREAK LOOPS)
   if (pathname.startsWith('/admin') && role !== 'ADMIN') {
-    return NextResponse.redirect(new URL('/cs/pos', request.url));
+    return NextResponse.redirect(new URL('/login', request.url));
   }
 
   if (pathname.startsWith('/cs') && role !== 'CS') {
-    return NextResponse.redirect(new URL('/admin/analytics', request.url));
+    return NextResponse.redirect(new URL('/login', request.url));
   }
 
   return NextResponse.next();
@@ -34,5 +40,5 @@ export function middleware(request: NextRequest) {
 
 // See "Matching Paths" below to learn more
 export const config = {
-  matcher: ['/admin/:path*', '/cs/:path*', '/login'],
+  matcher: ['/', '/admin/:path*', '/cs/:path*', '/login'],
 };
