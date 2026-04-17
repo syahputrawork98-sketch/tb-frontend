@@ -5,24 +5,42 @@ import { useRouter } from 'next/navigation';
 import styles from './login.module.css';
 import Input from '@/components/common/Input';
 import Button from '@/components/common/Button';
+import api from '@/utils/api';
 
 export default function LoginPage() {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
+  const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
   const router = useRouter();
 
-  const handleLogin = (e: React.FormEvent) => {
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
+    setError('');
+    setLoading(true);
     
-    // Mock Login Logic
-    const roleMap: { [key: string]: string } = {
-      'admin': '/admin',
-      'cs': '/cs'
-    };
+    try {
+      const response = await api.post('/auth/login', { username, password });
+      const { token, user } = response.data;
 
-    const targetPath = roleMap[username.toLowerCase()] || '/cs'; // Default to CS if not found
-    
-    router.push(targetPath);
+      // Save session
+      localStorage.setItem('tb_token', token);
+      localStorage.setItem('tb_user', JSON.stringify(user));
+
+      // Redirect based on backend role
+      const roleMap: { [key: string]: string } = {
+        'ADMIN': '/admin/analytics',
+        'CS': '/cs/pos'
+      };
+
+      const targetPath = roleMap[user.role] || '/cs';
+      router.push(targetPath);
+      
+    } catch (err: any) {
+      setError(err.response?.data?.message || 'Login failed. Please check your connection.');
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -51,8 +69,10 @@ export default function LoginPage() {
             required
           />
           
-          <Button type="submit" size="lg" style={{ marginTop: 'var(--spacing-md)' }}>
-            Sign In
+          {error && <p style={{ color: 'var(--color-error)', fontSize: '12px', marginBottom: '10px' }}>{error}</p>}
+          
+          <Button type="submit" size="lg" disabled={loading} style={{ marginTop: 'var(--spacing-md)' }}>
+            {loading ? 'Authenticating...' : 'Sign In'}
           </Button>
         </form>
 

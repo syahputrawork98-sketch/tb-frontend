@@ -1,6 +1,7 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import api from '@/utils/api';
 import styles from './pos.module.css';
 import { formatIDR } from '@/utils/format';
 import Input from '@/components/common/Input';
@@ -8,13 +9,15 @@ import Card from '@/components/common/Card';
 import Badge from '@/components/common/Badge';
 import Modal from '@/components/common/Modal';
 
-// Mock Data Produk
-const products = [
-  { id: 1, name: 'Semen Tiga Roda', price: 65000, unit: 'Sak', icon: '🧱' },
-  { id: 2, name: 'Besi Beton 10mm', price: 88000, unit: 'Lonjor', icon: '🏗️' },
-  { id: 3, name: 'Pipa PVC 3 inch', price: 45000, unit: 'Batang', icon: '🚿' },
-  { id: 4, name: 'Cat Dulux 5kg', price: 210000, unit: 'Pail', icon: '🎨' },
-];
+interface Product {
+  id: number;
+  name: string;
+  price: number;
+  stock: number;
+  unit: string;
+  icon: string;
+  sku: string;
+}
 
 interface CartItem {
   id: number;
@@ -24,15 +27,61 @@ interface CartItem {
 }
 
 export default function POSPage() {
+  const [products, setProducts] = useState<Product[]>([]);
   const [cart, setCart] = useState<CartItem[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [isProcessing, setIsProcessing] = useState(false);
   const [isSuccessModalOpen, setSuccessModalOpen] = useState(false);
+  const [error, setError] = useState('');
 
-  const addToCart = (product: any) => {
+  useEffect(() => {
+    fetchProducts();
+  }, []);
+
+  const fetchProducts = async () => {
+    try {
+      const response = await api.get('/products');
+      setProducts(response.data);
+    } catch (err) {
+      setError('Failed to load products.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const addToCart = (product: Product) => {
+    if (product.stock <= 0) return alert('Out of stock!');
+    
     const existing = cart.find(item => item.id === product.id);
     if (existing) {
+      if (existing.qty >= product.stock) return alert('Not enough stock!');
       setCart(cart.map(item => item.id === product.id ? { ...item, qty: item.qty + 1 } : item));
     } else {
       setCart([...cart, { id: product.id, name: product.name, price: product.price, qty: 1 }]);
+    }
+  };
+
+  const handleCheckout = async () => {
+    setIsProcessing(true);
+    setError('');
+
+    try {
+      const transactionData = {
+        totalAmount: total,
+        items: cart.map(item => ({
+          productId: item.id,
+          quantity: item.qty,
+          unitPrice: item.price
+        }))
+      };
+
+      await api.post('/transactions', transactionData);
+      setSuccessModalOpen(true);
+      fetchProducts(); // Refresh stocks
+    } catch (err: any) {
+      setError(err.response?.data?.message || 'Transaction failed.');
+    } finally {
+      setIsProcessing(false);
     }
   };
 
@@ -54,12 +103,18 @@ export default function POSPage() {
           }}>Search</button>
         </div>
 
+        {loading && <p style={{ textAlign: 'center', padding: 'var(--spacing-xl)' }}>Loading products...</p>}
+        {error && <p style={{ textAlign: 'center', color: 'var(--color-error)', padding: 'var(--spacing-xl)' }}>{error}</p>}
+
         <div className={styles.productList}>
           {products.map(p => (
-            <Card key={p.id} onClick={() => addToCart(p)}>
-              <div style={{ textAlign: 'center', fontSize: '32px', marginBottom: '10px' }}>{p.icon}</div>
+            <Card key={p.id} onClick={() => addToCart(p)} style={{ opacity: p.stock <= 0 ? 0.6 : 1, cursor: p.stock <= 0 ? 'not-allowed' : 'pointer' }}>
+              <div style={{ textAlign: 'center', fontSize: '32px', marginBottom: '10px' }}>{p.icon || '📦'}</div>
               <div style={{ fontWeight: 'bold', fontSize: '14px' }}>{p.name}</div>
               <div style={{ color: 'var(--color-text-muted)', fontSize: '12px' }}>{formatIDR(p.price)}</div>
+              <div style={{ fontSize: '11px', marginTop: '4px', color: p.stock > 10 ? 'var(--color-success)' : 'var(--color-error)' }}>
+                Stock: {p.stock} {p.unit}
+              </div>
             </Card>
           ))}
         </div>
@@ -98,10 +153,10 @@ export default function POSPage() {
           </div>
           <button 
             className={styles.checkoutBtn} 
-            disabled={cart.length === 0}
-            onClick={() => setSuccessModalOpen(true)}
+            disabled={cart.length === 0 || isProcessing}
+            onClick={handleCheckout}
           >
-            Process Payment
+            {isProcessing ? 'Processing Transaction...' : 'Process Payment'}
           </button>
         </div>
       </div>
