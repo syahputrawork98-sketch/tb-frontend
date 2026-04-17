@@ -1,47 +1,58 @@
 # 🎨 TB (Toko Bangunan) - Frontend Hub
 
-Antarmuka web resmi untuk **TB (Toko Bangunan)**. Dirancang untuk memberikan pengalaman belanja material bangunan yang mulus bagi pelanggan dan dashboard operasional yang efisien bagi Admin/CS.
+Antarmuka web resmi untuk aplikasi **TB (Toko Bangunan)**. Dirancang dengan estetika **"Industrial Blueprint"** yang bersih, teknis, dan sangat efisien untuk operasional harian toko bangunan.
 
 ---
 
 ## 🚀 Tech Stack
-- **Framework**: Next.js 14+ (App Router)
+- **Framework**: Next.js 16 (App Router)
 - **Language**: TypeScript
-- **Styling**: Vanilla CSS / Modular CSS
-- **State Management**: Context API / Zustand
+- **State Management**: Zustand (with Persist Middleware)
+- **Styling**: Vanilla CSS Modules (Industrial Design Language)
+- **Auth Flow**: JWT + Cookie-based Middleware protection
 
 ---
 
-## 📁 Directory Structure
-```text
-src/
-├── app/            # Next.js Pages & Routes
-├── components/     # Reusable UI Components
-├── hooks/          # Custom React Hooks
-├── services/       # API Integration Layer
-├── styles/         # Global & Modular CSS
-└── utils/          # Helper functions & Formatters
-```
+## 🌟 Professional Features
+
+### 🏢 Super Admin Dashboard
+- **Sales Analytics**: Visualisasi grafik tren penjualan 7 hari terakhir dan laba kotor real-time.
+- **Inventory Control**: Manajemen produk lengkap dengan pemisahan HPP (Harga Pokok Penjualan) dan Harga Jual.
+- **Shop Settings**: Pusat konfigurasi identitas toko dan ambang batas stok global.
+
+### 💼 Customer Service (CS) Operational Hub
+- **Express POS**: Sistem kasir cepat dengan pencarian SKU dan kalkulasi otomatis.
+- **Inventory Explorer**: Cek stok barang secara instan tanpa akses ke harga modal (Read-only).
+- **Transaction History**: Melihat riwayat transaksi mandiri per-shift dan fitur cetak ulang struk thermal.
+- **Secure Profile**: Manajemen akun mandiri dengan fitur "Show/Hide Password" terintegrasi.
 
 ---
 
-## 🌟 Key UX Features (Roadmap)
-- [ ] **Admin Analytics**: Visualisasi grafik pendapatan dan laba.
-- [ ] **POS (Point of Sale)**: Interface kasir cepat untuk staf CS.
-- [ ] **Inventory Master**: Manajemen stok dan harga material.
-- [ ] **Responsive Mode**: Tampilan optimal di HP (untuk CS) dan Desktop (untuk Admin).
+## 🎨 Industrial Blueprint Design
+Dikonsep untuk memberikan kesan profesional teknik:
+- **Premium Corner Accents**: Detil garis geometris di setiap sudut halaman.
+- **Clean Typography**: Menggunakan font Inter untuk legibilitas maksimal.
+- **Industrial Accents**: Penggunaan warna *Deep Industrial Gray* dan *Safety Orange* sebagai aksen utama.
 
 ---
 
 ## 🛠️ Getting Started
+
 1. **Installation**:
    ```bash
    npm install
    ```
-2. **Execution**:
+
+2. **Environment Configuration**:
+   Buat file `.env.local` dan isi dengan:
+   ```env
+   NEXT_PUBLIC_API_URL=http://localhost:5000/api
+   ```
+
+3. **Execution**:
    ```bash
    npm run dev
    ```
 
 ---
-> *Crafting Beauty for TB (Toko Bangunan) with Vanilla CSS Precision.*
+> *Crafting Technical Excellence for TB (Toko Bangunan) with High-Fidelity UI. v1.0.0*
