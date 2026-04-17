@@ -26,10 +26,10 @@ src/
 ---
 
 ## 🌟 Key UX Features (Roadmap)
-- [ ] **Product Catalog**: Filter material berdasarkan kategori & harga.
-- [ ] **Cart & Checkout**: Simulasi pemesanan barang berat.
-- [ ] **Admin Dashboard**: Visualisasi data stok & pesanan masuk.
-- [ ] **Responsive Mode**: Tampilan optimal di HP dan Tablet.
+- [ ] **Admin Analytics**: Visualisasi grafik pendapatan dan laba.
+- [ ] **POS (Point of Sale)**: Interface kasir cepat untuk staf CS.
+- [ ] **Inventory Master**: Manajemen stok dan harga material.
+- [ ] **Responsive Mode**: Tampilan optimal di HP (untuk CS) dan Desktop (untuk Admin).
 
 ---
 

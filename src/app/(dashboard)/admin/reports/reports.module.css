@@ -1,0 +1,89 @@
+.container {
+  padding: var(--spacing-xl);
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xl);
+}
+
+.filterBar {
+  background-color: var(--color-bg-card);
+  padding: var(--spacing-lg) var(--spacing-xl);
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--color-border);
+  display: flex;
+  align-items: flex-end;
+  gap: var(--spacing-md);
+  box-shadow: var(--shadow-small);
+}
+
+.dateGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.dateGroup label {
+  font-size: 11px;
+  font-weight: bold;
+  text-transform: uppercase;
+  color: var(--color-text-muted);
+}
+
+.dateInput {
+  padding: 10px;
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  font-size: 14px;
+  background-color: white;
+}
+
+.reportCard {
+  background-color: var(--color-bg-card);
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--color-border);
+  box-shadow: var(--shadow-small);
+  overflow: hidden;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.table th {
+  text-align: left;
+  padding: var(--spacing-lg) var(--spacing-xl);
+  background-color: var(--color-bg-main);
+  font-size: var(--font-size-xs);
+  text-transform: uppercase;
+  color: var(--color-text-muted);
+}
+
+.table td {
+  padding: var(--spacing-lg) var(--spacing-xl);
+  border-bottom: 1px solid var(--color-bg-main);
+  font-size: var(--font-size-sm);
+}
+
+.itemLine {
+  font-size: 12px;
+  color: var(--color-text-muted);
+  display: list-item;
+  list-style-type: disc;
+  margin-left: 20px;
+}
+
+/* Print Styling */
+@media print {
+  .no-print {
+    display: none !important;
+  }
+  .container {
+    padding: 0;
+    margin: 0;
+  }
+  .reportCard {
+    border: none;
+    box-shadow: none;
+  }
+}

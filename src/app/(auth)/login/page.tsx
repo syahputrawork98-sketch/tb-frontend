@@ -6,12 +6,14 @@ import styles from './login.module.css';
 import Input from '@/components/common/Input';
 import Button from '@/components/common/Button';
 import api from '@/utils/api';
+import { useAuthStore } from '@/store/authStore';
 
 export default function LoginPage() {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const { setAuth } = useAuthStore();
   const router = useRouter();
 
   const handleLogin = async (e: React.FormEvent) => {
@@ -23,21 +25,22 @@ export default function LoginPage() {
       const response = await api.post('/auth/login', { username, password });
       const { token, user } = response.data;
 
-      // Save session
-      localStorage.setItem('tb_token', token);
-      localStorage.setItem('tb_user', JSON.stringify(user));
+      // 1. Store in Zustand Store (Handled persist & Cookies inside setAuth)
+      setAuth(user, token);
 
-      // Redirect based on backend role
+      // 2. Redirect based on backend role
       const roleMap: { [key: string]: string } = {
         'ADMIN': '/admin/analytics',
         'CS': '/cs/pos'
       };
 
-      const targetPath = roleMap[user.role] || '/cs';
+      const targetPath = roleMap[user.role] || '/cs/pos';
       router.push(targetPath);
       
     } catch (err: any) {
-      setError(err.response?.data?.message || 'Login failed. Please check your connection.');
+      console.error('Login error:', err);
+      const message = err.response?.data?.message || 'Login failed. Connection error or server down.';
+      setError(message);
     } finally {
       setLoading(false);
     }

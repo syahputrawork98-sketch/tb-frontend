@@ -7,13 +7,14 @@ interface CardProps {
   footer?: React.ReactNode;
   className?: string;
   onClick?: () => void;
+  style?: React.CSSProperties;
 }
 
-const Card: React.FC<CardProps> = ({ title, children, footer, className = '', onClick }) => {
+const Card: React.FC<CardProps> = ({ title, children, footer, className = '', onClick, style }) => {
   const cardClass = `${styles.card} ${onClick ? styles.clickable : ''} ${className}`;
   
   return (
-    <div className={cardClass} onClick={onClick}>
+    <div className={cardClass} onClick={onClick} style={style}>
       {title && (
         <div className={styles.header}>
           <h3 className={styles.title}>{title}</h3>

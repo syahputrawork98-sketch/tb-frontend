@@ -11,12 +11,13 @@ import Modal from '@/components/common/Modal';
 
 interface Product {
   id: number;
+  sku: string;
   name: string;
   price: number;
   stock: number;
   unit: string;
-  icon: string;
-  sku: string;
+  category: string;
+  icon?: string;
 }
 
 interface CartItem {
@@ -24,15 +25,27 @@ interface CartItem {
   name: string;
   price: number;
   qty: number;
+  stock: number;
+  category: string;
+  icon?: string;
 }
 
+import { usePosStore } from '@/store/posStore';
+
 export default function POSPage() {
+  const { 
+    cart, addToCart, removeOne, removeItem, clearCart,
+    searchQuery, setSearchQuery, 
+    selectedCategory, setSelectedCategory 
+  } = usePosStore();
+
   const [products, setProducts] = useState<Product[]>([]);
-  const [cart, setCart] = useState<CartItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [isProcessing, setIsProcessing] = useState(false);
   const [isSuccessModalOpen, setSuccessModalOpen] = useState(false);
   const [error, setError] = useState('');
+
+  const categories = ['All', 'Semen', 'Besi', 'Cat', 'Lainnya'];
 
   useEffect(() => {
     fetchProducts();
@@ -49,19 +62,15 @@ export default function POSPage() {
     }
   };
 
-  const addToCart = (product: Product) => {
-    if (product.stock <= 0) return alert('Out of stock!');
-    
-    const existing = cart.find(item => item.id === product.id);
-    if (existing) {
-      if (existing.qty >= product.stock) return alert('Not enough stock!');
-      setCart(cart.map(item => item.id === product.id ? { ...item, qty: item.qty + 1 } : item));
-    } else {
-      setCart([...cart, { id: product.id, name: product.name, price: product.price, qty: 1 }]);
-    }
-  };
+  const filteredProducts = products.filter(p => {
+    const matchesSearch = p.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
+                          p.sku.toLowerCase().includes(searchQuery.toLowerCase());
+    const matchesCategory = selectedCategory === 'All' || p.category === selectedCategory;
+    return matchesSearch && matchesCategory;
+  });
 
   const handleCheckout = async () => {
+    if (cart.length === 0) return;
     setIsProcessing(true);
     setError('');
 
@@ -85,8 +94,8 @@ export default function POSPage() {
     }
   };
 
-  const removeFromCart = (id: number) => {
-    setCart(cart.filter(item => item.id !== id));
+  const handlePrint = () => {
+    window.print();
   };
 
   const total = cart.reduce((acc, item) => acc + (item.price * item.qty), 0);
@@ -96,18 +105,30 @@ export default function POSPage() {
       {/* Search & Product Selection */}
       <div className={styles.productSection}>
         <div className={styles.searchBar}>
-          <Input placeholder="Search material by name or SKU..." style={{ marginBottom: 0 }} />
-          <button style={{ 
-            backgroundColor: 'var(--color-primary-900)', 
-            color: 'white', border: 'none', borderRadius: '8px', padding: '0 20px' 
-          }}>Search</button>
+          <Input 
+            placeholder="Search material by name or SKU..." 
+            style={{ marginBottom: 0, flex: 1 }} 
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+          />
+        </div>
+
+        <div className={styles.categories}>
+          {categories.map(cat => (
+            <button 
+              key={cat} 
+              className={`${styles.categoryTab} ${selectedCategory === cat ? styles.categoryTabActive : ''}`}
+              onClick={() => setSelectedCategory(cat)}
+            >
+              {cat}
+            </button>
+          ))}
         </div>
 
         {loading && <p style={{ textAlign: 'center', padding: 'var(--spacing-xl)' }}>Loading products...</p>}
-        {error && <p style={{ textAlign: 'center', color: 'var(--color-error)', padding: 'var(--spacing-xl)' }}>{error}</p>}
-
+        
         <div className={styles.productList}>
-          {products.map(p => (
+          {filteredProducts.map(p => (
             <Card key={p.id} onClick={() => addToCart(p)} style={{ opacity: p.stock <= 0 ? 0.6 : 1, cursor: p.stock <= 0 ? 'not-allowed' : 'pointer' }}>
               <div style={{ textAlign: 'center', fontSize: '32px', marginBottom: '10px' }}>{p.icon || '📦'}</div>
               <div style={{ fontWeight: 'bold', fontSize: '14px' }}>{p.name}</div>
@@ -117,30 +138,44 @@ export default function POSPage() {
               </div>
             </Card>
           ))}
+          {filteredProducts.length === 0 && !loading && (
+            <p style={{ gridColumn: '1/-1', textAlign: 'center', padding: 'var(--spacing-xl)', color: 'var(--color-text-muted)' }}>
+              No products found matches your search.
+            </p>
+          )}
         </div>
       </div>
 
       {/* Cart & Checkout */}
       <div className={styles.cartSection}>
         <div className={styles.cartHeader}>
-          <h2 className={styles.cartTitle}>Current Order</h2>
-          <Badge variant="info">{cart.length} Items</Badge>
+          <h2 className={styles.cartTitle}>Order Details</h2>
+          <button className={styles.clearBtn} onClick={clearCart}>Clear</button>
         </div>
 
         <div className={styles.cartItems}>
           {cart.length === 0 ? (
             <div className={styles.emptyCart}>
               <span>🛒</span>
-              <p>No items in cart</p>
+              <p>Cart is empty</p>
             </div>
           ) : (
             cart.map(item => (
               <div key={item.id} className={styles.cartItem}>
                 <div className={styles.itemInfo}>
                   <span className={styles.itemName}>{item.name}</span>
-                  <span className={styles.itemPrice}>{item.qty} x {formatIDR(item.price)}</span>
+                  <span className={styles.itemPrice}>{formatIDR(item.price)}</span>
                 </div>
-                <button onClick={() => removeFromCart(item.id)} style={{ background: 'none', border: 'none', cursor: 'pointer' }}>❌</button>
+                
+                <div className={styles.qtyControls}>
+                  <button className={styles.qtyBtn} onClick={() => removeOne(item.id)}>-</button>
+                  <span className={styles.qtyValue}>{item.qty}</span>
+                  <button 
+                    className={styles.qtyBtn} 
+                    onClick={() => addToCart(item)}
+                    disabled={item.qty >= item.stock}
+                  >+</button>
+                </div>
               </div>
             ))
           )}
@@ -148,15 +183,16 @@ export default function POSPage() {
 
         <div className={styles.cartFooter}>
           <div className={styles.totalRow}>
-            <span className={styles.totalLabel}>Grand Total</span>
+            <span className={styles.totalLabel}>Total Payment</span>
             <span className={styles.totalAmount}>{formatIDR(total)}</span>
           </div>
+          {error && <p style={{ color: '#ffb3b3', fontSize: '11px', marginBottom: '10px' }}>{error}</p>}
           <button 
             className={styles.checkoutBtn} 
             disabled={cart.length === 0 || isProcessing}
             onClick={handleCheckout}
           >
-            {isProcessing ? 'Processing Transaction...' : 'Process Payment'}
+            {isProcessing ? 'Processing...' : 'Complete Transaction'}
           </button>
         </div>
       </div>
@@ -164,17 +200,49 @@ export default function POSPage() {
       {/* Receipt Modal */}
       <Modal 
         isOpen={isSuccessModalOpen} 
-        onClose={() => { setSuccessModalOpen(false); setCart([]); }} 
-        title="Transaction Success"
+        onClose={() => { setSuccessModalOpen(false); clearCart(); }} 
+        title="Transaction Finalized"
       >
-        <div style={{ textAlign: 'center' }}>
-          <div style={{ fontSize: '48px', marginBottom: '16px' }}>✅</div>
-          <h3>Payment Completed!</h3>
-          <p style={{ color: 'var(--color-text-muted)', marginTop: '8px' }}>
-            Receipt has been printed and stock updated.
-          </p>
-          <div style={{ marginTop: '24px', padding: '16px', backgroundColor: 'var(--color-bg-main)', borderRadius: '8px' }}>
-            <strong>Total: {formatIDR(total)}</strong>
+        <div className="modalContent" style={{ textAlign: 'center' }}>
+          <div style={{ fontSize: '48px', marginBottom: '16px' }}>🏗️</div>
+          <h3>TB (Toko Bangunan)</h3>
+          <p style={{ fontSize: '12px', color: 'var(--color-text-muted)' }}>Official Digital Receipt</p>
+          
+          <hr style={{ margin: '20px 0', border: 'none', borderTop: '1px dashed var(--color-border)' }} />
+          
+          <div style={{ textAlign: 'left', fontSize: '13px' }}>
+            {cart.map(item => (
+              <div key={item.id} style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px' }}>
+                <span>{item.name} (x{item.qty})</span>
+                <span>{formatIDR(item.price * item.qty)}</span>
+              </div>
+            ))}
+          </div>
+
+          <hr style={{ margin: '20px 0', border: 'none', borderTop: '2px solid var(--color-bg-main)' }} />
+          
+          <div style={{ display: 'flex', justifyContent: 'space-between', fontWeight: 'bold' }}>
+            <span>GRAND TOTAL</span>
+            <span>{formatIDR(total)}</span>
+          </div>
+
+          <div style={{ marginTop: '32px' }} className="no-print">
+            <button 
+              onClick={handlePrint}
+              style={{ 
+                width: '100%', padding: '12px', backgroundColor: 'var(--color-primary-900)', 
+                color: 'white', border: 'none', borderRadius: '8px', fontWeight: 'bold', cursor: 'pointer',
+                marginBottom: '10px'
+              }}
+            >
+              🖨️ Print Receipt
+            </button>
+            <button 
+              onClick={() => { setSuccessModalOpen(false); clearCart(); }}
+              style={{ width: '100%', padding: '12px', background: 'none', border: '1px solid var(--color-border)', borderRadius: '8px', cursor: 'pointer' }}
+            >
+              New Transaction
+            </button>
           </div>
         </div>
       </Modal>

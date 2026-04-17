@@ -1,87 +1,109 @@
 'use client';
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
+import api from '@/utils/api';
 import styles from './analytics.module.css';
-import Card from '@/components/common/Card';
-import Badge from '@/components/common/Badge';
 import { formatIDR } from '@/utils/format';
+import { useAuthStore } from '@/store/authStore';
 
-export default function AnalyticsPage() {
-  // Mock Data
-  const stats = [
-    { label: 'Total Revenue', value: 45850000, change: '+12.5%', isUp: true },
-    { label: 'Total Orders', value: 128, change: '+8%', isUp: true },
-    { label: 'Avg. Transaction', value: 358000, change: '-2%', isUp: false },
-    { label: 'Active Customers', value: 84, change: '+5.4%', isUp: true },
-  ];
+interface SummaryData {
+  totalRevenue: number;
+  totalTransactions: number;
+  totalProfit: number;
+}
 
-  const profitData = [
-    { month: 'Jan', value: 45 },
-    { month: 'Feb', value: 65 },
-    { month: 'Mar', value: 85 },
-    { month: 'Apr', value: 55 },
-    { month: 'May', value: 95 },
-    { month: 'Jun', value: 75 },
-  ];
+interface ChartData {
+  date: string;
+  amount: number;
+}
 
-  const activities = [
-    { id: 1, text: 'CS Artdarkman processed order #1024', time: '5 mins ago', icon: '📝' },
-    { id: 2, text: 'Stock update: Semen Tiga Roda (+50)', time: '1 hour ago', icon: '📦' },
-    { id: 3, text: 'Price update: Besi Beton 10mm', time: '3 hours ago', icon: '🏷️' },
-    { id: 4, text: 'New customer registration: Budi Properti', time: '5 hours ago', icon: '👤' },
-  ];
+export default function AdminAnalyticsPage() {
+  const [summary, setSummary] = useState<SummaryData | null>(null);
+  const [chartData, setChartData] = useState<ChartData[]>([]);
+  const [loading, setLoading] = useState(true);
+  const { user } = useAuthStore();
+
+  useEffect(() => {
+    fetchData();
+  }, []);
+
+  const fetchData = async () => {
+    try {
+      const [sumRes, chartRes] = await Promise.all([
+        api.get('/analytics/summary'),
+        api.get('/analytics/chart')
+      ]);
+      setSummary(sumRes.data);
+      setChartData(chartRes.data);
+    } catch (error) {
+      console.error('Failed to fetch analytics:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const maxAmount = chartData.length > 0 ? Math.max(...chartData.map(d => d.amount)) : 0;
 
   return (
-    <div className={styles.wrapper}>
-      <header>
-        <h1 style={{ color: 'var(--color-primary-900)', fontSize: 'var(--font-size-2xl)', fontWeight: 'var(--font-weight-bold)' }}>
-          Business Analytics
-        </h1>
-        <p style={{ color: 'var(--color-text-muted)' }}>Real-time performance overview of TB (Toko Bangunan).</p>
+    <div className={styles.container}>
+      <header className={styles.header}>
+        <div>
+          <h1 style={{ fontSize: 'var(--font-size-2xl)', fontWeight: 'bold' }}>Business Intelligence</h1>
+          <p style={{ color: 'var(--color-text-muted)' }}>Welcome back, {user?.username}. Overview of Toko Bangunan performance.</p>
+        </div>
+        <button 
+          onClick={fetchData}
+          style={{ 
+            padding: '10px 20px', backgroundColor: 'var(--color-primary-900)', 
+            color: 'white', border: 'none', borderRadius: '8px', cursor: 'pointer' 
+          }}
+        >
+          🔄 Refresh Data
+        </button>
       </header>
 
-      {/* Stats Overview */}
+      {/* Statistics Grid */}
       <div className={styles.statsGrid}>
-        {stats.map((stat, i) => (
-          <Card key={i} className={styles.statCard}>
-            <span className={styles.statLabel}>{stat.label}</span>
-            <span className={styles.statValue}>
-              {typeof stat.value === 'number' && stat.label.includes('Revenue') ? formatIDR(stat.value) : (typeof stat.value === 'number' && stat.label.includes('Avg') ? formatIDR(stat.value) : stat.value)}
-            </span>
-            <span className={`${styles.statChange} ${stat.isUp ? styles.up : styles.down}`}>
-              {stat.isUp ? '↗' : '↘'} {stat.change} <span style={{color: 'var(--color-text-muted)'}}>vs last month</span>
-            </span>
-          </Card>
-        ))}
+        <div className={styles.statCard}>
+          <span className={styles.statLabel}>Total Revenue</span>
+          <span className={styles.statValue}>{formatIDR(summary?.totalRevenue || 0)}</span>
+        </div>
+        <div className={styles.statCard}>
+          <span className={styles.statLabel}>Total Transactions</span>
+          <span className={styles.statValue}>{summary?.totalTransactions || 0}</span>
+        </div>
+        <div className={styles.statCard}>
+          <span className={styles.statLabel}>Est. Total Profit</span>
+          <span className={`${styles.statValue}`} style={{ color: 'var(--color-success)' }}>
+            {formatIDR(summary?.totalProfit || 0)}
+          </span>
+        </div>
       </div>
 
-      {/* Charts & Activity */}
-      <div className={styles.chartsArea}>
-        <Card title="Monthly Profit Trend" className={styles.chartCard}>
-          <div className={styles.barContainer}>
-            {profitData.map((d, i) => (
-              <div key={i} className={styles.barGroup}>
-                <div className={styles.bar} style={{ height: `${d.value}%` }}></div>
-                <span className={styles.barLabel}>{d.month}</span>
+      {/* Sales Trend Chart */}
+      <div className={styles.chartContainer}>
+        <h2 className={styles.chartTitle}>Revenue Trend (Last 7 Days)</h2>
+        <div className={styles.chartArea}>
+          {chartData.length === 0 && !loading && (
+            <p style={{ width: '100%', textAlign: 'center', color: 'var(--color-text-muted)' }}>No sales data available yet.</p>
+          )}
+          {chartData.map((d, index) => {
+            const height = maxAmount > 0 ? (d.amount / maxAmount) * 100 : 0;
+            return (
+              <div key={index} className={styles.barWrapper}>
+                <div className={styles.barTooltip}>{formatIDR(d.amount)}</div>
+                <div 
+                  className={styles.bar} 
+                  style={{ height: `${height}%` }}
+                ></div>
+                <span className={styles.barLabel}>{d.date.split('-').slice(1).reverse().join('/')}</span>
               </div>
-            ))}
-          </div>
-        </Card>
-
-        <Card title="Recent Activity" className={styles.chartCard}>
-          <div className={styles.activityList}>
-            {activities.map(act => (
-              <div key={act.id} className={styles.activityItem}>
-                <div className={styles.activityIcon}>{act.icon}</div>
-                <div className={styles.activityContent}>
-                  <span className={styles.activityText}>{act.text}</span>
-                  <span className={styles.activityTime}>{act.time}</span>
-                </div>
-              </div>
-            ))}
-          </div>
-        </Card>
+            );
+          })}
+        </div>
       </div>
+
+      {/* Additional Analytics Sections Can Be Added Here */}
     </div>
   );
 }
